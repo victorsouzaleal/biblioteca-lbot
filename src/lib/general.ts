@@ -57,7 +57,7 @@ export function mangaReleases(){
 
             $mangas.forEach($manga =>{
                 let name = $manga.querySelector('h3.chapter-title > span.series-name')?.innerHTML.trim()
-                let chapter = $manga.querySelector('h3.chapter-title > span.series-name')?.innerHTML.trim()
+                let chapter = $manga.querySelector('h3.chapter-title > span.chapter-name')?.innerHTML.trim()
                 let url = `https://mangabr.net${$manga.querySelector('a.link-chapter')?.getAttribute('href')}`
                 
                 if(!name || !chapter){
