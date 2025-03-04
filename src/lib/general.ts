@@ -17,20 +17,22 @@ const mediaPath = path.resolve(import.meta.dirname, '..', 'media')
 
 export function animeReleases(){
     return new Promise<AnimeRelease[]>((resolve)=>{
-        const URL_BASE = 'https://animefire.plus/'
+        const URL_BASE = 'https://animedays.org/'
         axios.get(URL_BASE, {headers: {"User-Agent": new UserAgent().toString()}}).then(({data})=>{
             const { window : { document } } = new JSDOM(data)
-            let $animes = document.querySelectorAll('div.divCardUltimosEpsHome')
+            let $animes = document.querySelectorAll('div.postbody > div:nth-child(2) > div.listupd.normal > div.excstf > article > div')
             let animes : AnimeRelease[] = []
 
             $animes.forEach($anime =>{
-                let name = $anime.querySelector('h3')?.innerHTML
-                let episode = $anime.querySelector('span.numEp')?.innerHTML
+                let name = $anime.querySelector('a > div.tt > h2')?.innerHTML
+                let episode = $anime.querySelector('a > div.limit > div.bt > span.epx')?.innerHTML
                 let url = $anime.querySelector('a')?.href
 
                 if(!name || !episode || !url){
                     throw new Error("Houve um erro ao coletar os dados dos animes.")
                 } 
+
+                name = name.split("Episódio")[0]
 
                 animes.push({
                     name,
