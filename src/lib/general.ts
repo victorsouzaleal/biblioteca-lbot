@@ -227,15 +227,16 @@ export function webSearchGoogle(texto: string){
 }
 
 export function wheatherInfo(location: string){
-    return new Promise <Wheather> ((resolve)=>{
+    return new Promise <Wheather> ((resolve, reject)=>{
         const WEATHER_API_URL = `http://api.weatherapi.com/v1/forecast.json?key=516f58a20b6c4ad3986123104242805&q=${encodeURIComponent(location)}&days=3&aqi=no&alerts=no`
         axios.get(WEATHER_API_URL).then(async (res)=>{
             const wheatherResult = res.data
             const {data: wheatherConditions} = await axios.get("https://www.weatherapi.com/docs/conditions.json", {responseType: 'json'})
+
             const currentCondition = wheatherConditions.find((condition: { code: number })=> {
-                condition.code == wheatherResult.current.condition.code
+                return condition.code === wheatherResult.current.condition.code
             }).languages.find((language: { lang_iso: string }) =>{
-                language.lang_iso == 'pt'
+                return language.lang_iso == 'pt'
             })
 
             let weatherResponse : Wheather = {
@@ -259,9 +260,9 @@ export function wheatherInfo(location: string){
 
             wheatherResult.forecast.forecastday.forEach((forecast : any) => {
                 const conditionDay = wheatherConditions.find((condition: { code: number })=>{
-                    condition.code == forecast.day.condition.code
-                }).languages.find((idioma: { lang_iso: string }) => {
-                    idioma.lang_iso == 'pt'
+                    return condition.code == forecast.day.condition.code
+                }).languages.find((lang: { lang_iso: string }) => {
+                    return lang.lang_iso == 'pt'
                 })
                 const [year, month, day] = forecast.date.split("-")
                 const forecastDay = {
@@ -281,8 +282,8 @@ export function wheatherInfo(location: string){
             })
 
             resolve(weatherResponse)
-        }).catch(()=>{
-            throw new Error("Houve um erro no servidor de pesquisa de clima.")
+        }).catch((err)=>{
+            reject(new Error("Houve um erro no servidor de pesquisa de clima."))
         })
     })
 }
