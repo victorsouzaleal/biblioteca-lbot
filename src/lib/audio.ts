@@ -11,7 +11,7 @@ import FormData from 'form-data'
 import { AudioModificationType, MusicRecognition } from './interfaces.js'
 
 
-export function textToVoice (lang: string, text: string){
+export function textToVoice (lang: "pt" | 'en' | 'ja' | 'es' | 'it' | 'ru' | 'ko' | 'sv', text: string){
     return new Promise <Buffer> ((resolve)=>{
         const audioPath =  getTempPath("mp3")
         tts(lang).save(audioPath, text, ()=>{

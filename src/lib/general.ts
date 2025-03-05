@@ -15,6 +15,28 @@ import { AnimeRelease, CurrencyConvert, DDD, MangaRelease, MusicLyrics, News, Tr
 import path from 'node:path'
 const mediaPath = path.resolve(import.meta.dirname, '..', 'media')
 
+export function simSimi(text: string){
+    return new Promise <string> ((resolve)=>{
+        const URL_BASE = 'https://api.simsimi.vn/v2/simtalk'
+        const config = {
+            url: URL_BASE,
+            method: "post",
+            headers : {'Content-Type': 'application/x-www-form-urlencoded'},
+            data : qs.stringify({text, lc: 'pt'})
+        }
+
+        axios(config).then((simi)=>{
+            resolve(simi.data.message)
+        }).catch((err)=>{
+            if(err.response?.data?.message){
+                resolve(err.response.data.message)
+            } else {
+                throw new Error("Houve um erro no servidor do SimSimi.")
+            }        
+        })
+    })
+}
+
 export function animeReleases(){
     return new Promise<AnimeRelease[]>((resolve)=>{
         const URL_BASE = 'https://animedays.org/'
@@ -148,7 +170,7 @@ export function newsGoogle(lang= 'pt'){
     })
 }
 
-export function translationGoogle(text: string, lang: string){
+export function translationGoogle(text: string, lang: "pt" | "es" | "en" | "ja" | "it" | "ru" | "ko"){
     return new Promise <string> ((resolve)=>{
         translate(text , {to: lang}).then((res)=>{
             resolve(res.text)
