@@ -233,11 +233,11 @@ export function wheatherInfo(location: string){
             const wheatherResult = res.data
             const {data: wheatherConditions} = await axios.get("https://www.weatherapi.com/docs/conditions.json", {responseType: 'json'})
 
-            const currentCondition = wheatherConditions.find((condition: { code: number })=> {
-                return condition.code === wheatherResult.current.condition.code
-            }).languages.find((language: { lang_iso: string }) =>{
-                return language.lang_iso == 'pt'
-            })
+            const currentCondition = wheatherConditions.find((condition: { code: number }) => 
+                condition.code === wheatherResult.current.condition.code
+            ).languages.find((language: { lang_iso: string }) =>
+                language.lang_iso == 'pt'
+            )
 
             let weatherResponse : Wheather = {
                 location: {
@@ -259,11 +259,11 @@ export function wheatherInfo(location: string){
             }
 
             wheatherResult.forecast.forecastday.forEach((forecast : any) => {
-                const conditionDay = wheatherConditions.find((condition: { code: number })=>{
-                    return condition.code == forecast.day.condition.code
-                }).languages.find((lang: { lang_iso: string }) => {
-                    return lang.lang_iso == 'pt'
-                })
+                const conditionDay = wheatherConditions.find((condition: { code: number }) =>
+                    condition.code == forecast.day.condition.code
+                ).languages.find((lang: { lang_iso: string }) => 
+                    lang.lang_iso == 'pt'
+                )
                 const [year, month, day] = forecast.date.split("-")
                 const forecastDay = {
                     day : `${day}/${month}/${year}`,
@@ -415,24 +415,20 @@ export function cardsAgainstHumanity(){
 }
 
 export function infoDDD(ddd: string){
-    return new Promise <DDD> ((resolve) =>{
+    return new Promise <DDD> ((resolve, reject) =>{
         const URL_BASE = 'https://gist.githubusercontent.com/victorsouzaleal/ea89a42a9f912c988bbc12c1f3c2d110/raw/af37319b023503be780bb1b6a02c92bcba9e50cc/ddd.json'
         axios.get(URL_BASE).then(({data})=>{
             const states = data.estados
-            const indexDDD = states.findIndex((state : { ddd: string }) =>{
-                state.ddd.includes(ddd)
-            }) 
-
-            if(indexDDD === -1){
-                throw new Error("Este DDD não foi encontrado, certifique-se que ele é válido.")
-            }
+            const indexDDD = states.findIndex((state : { ddd: string }) => state.ddd.includes(ddd))
                 
+            if(indexDDD === -1) reject(new Error("Este DDD não foi encontrado, certifique-se que ele é válido."))
+        
             resolve({
                 state: states[indexDDD].nome,
                 region: states[indexDDD].regiao
             })
         }).catch(()=>{
-            throw new Error("Houve um erro no servidor para obter os dados do DDD.")
+            reject(new Error("Houve um erro no servidor para obter os dados do DDD."))
         })
     })
 }
