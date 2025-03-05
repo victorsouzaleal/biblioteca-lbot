@@ -32,7 +32,6 @@
     "@victorsouzaleal/googlethis": "^1.8.1",
     "@vitalets/google-translate-api": "^7.0.0",
     "axios": "^1.7.4",
-    "correios-brasil": "^2.2.2",
     "emoji-mixer": "^1.1.12",
     "fb-downloader-scrapper": "^3.0.0",
     "file-type": "^20.1.0",

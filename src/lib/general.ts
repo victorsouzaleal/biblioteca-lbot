@@ -1,7 +1,6 @@
 import axios from 'axios'
 import fs from 'fs-extra'
 import {prettyNum} from 'pretty-num'
-import { rastrearEncomendas, RastreioResponse } from 'correios-brasil'
 import translate from '@vitalets/google-translate-api'
 import google from '@victorsouzaleal/googlethis'
 import { OrganicResult, search } from 'google-sr'
@@ -191,21 +190,6 @@ export function shortenUrl(url: string){
             resolve(data.data)
         }).catch(() =>{
             throw new Error(`Houve um erro no servidor de encurtar link.`)
-        })
-    })
-}
-
-
-export function trackingCorreios(codigoRastreio: string){
-    return new Promise <RastreioResponse> (async (resolve)=>{
-        rastrearEncomendas([codigoRastreio]).then((res)=>{
-            if(!res) {
-                throw new Error('Parece que este objeto ainda não foi postado ou não existe')
-            }
-
-            resolve(res)
-        }).catch(()=>{
-            throw new Error("Houve um erro no servidor dos Correios.")
         })
     })
 }
