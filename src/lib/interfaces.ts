@@ -142,7 +142,7 @@ export interface AnimeRecognition {
     final_time : string,
     episode : string,
     title : string,
-    similarity : string,
+    similarity : number,
     preview_url: string
 }
 

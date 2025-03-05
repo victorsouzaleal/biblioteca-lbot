@@ -130,7 +130,7 @@ export function animeRecognition(imageBuffer : Buffer){
                 final_time: duration.default(msFinal).format("h:mm:ss"),
                 episode: data.result[0].episode,
                 title: data.result[0].anilist.title.english || data.result[0].anilist.title.romaji,
-                similarity: (data.result[0].similarity * 100).toFixed(2),
+                similarity: parseInt((data.result[0].similarity * 100).toFixed(2)),
                 preview_url: data.result[0].video
             })
         }).catch(err =>{
