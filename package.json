@@ -21,12 +21,13 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build",
+    "prepack": "npm run build",
     "build": "tsc",
     "postbuild": "copyfiles -f ./src/media/*.png ./dist/media & rollup ./dist/index.js --format cjs --file ./dist/index.cjs "
   },
   "dependencies": {
     "@deepgram/sdk": "^3.5.1",
-    "@distube/ytdl-core": "^4.16.0",
+    "@distube/ytdl-core": "^4.16.4",
     "@tobyg74/tiktok-api-dl": "^1.1.9",
     "@victorsouzaleal/brasileirao": "^1.1.1",
     "@victorsouzaleal/googlethis": "^1.8.1",

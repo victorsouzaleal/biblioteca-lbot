@@ -7,43 +7,53 @@ import {fileTypeFromBuffer} from 'file-type'
 import jimp from 'jimp'
 import { StickerOptions, StickerType } from "./interfaces.js"
 
-export function createSticker(mediaBuffer : Buffer, {pack = 'LBOT', author = 'LBOT Stickers', fps = 9, type = 'resize'}: StickerOptions){
-    return new Promise <Buffer> ((resolve)=>{
-        stickerCreation(mediaBuffer, {pack, author, fps, type}).then((bufferSticker)=>{
-            resolve(bufferSticker)
-        }).catch(() =>{
-            throw new Error("Houve um erro na criação de sticker.")
+export async function createSticker(mediaBuffer : Buffer, {pack = 'LBOT', author = 'LBOT Stickers', fps = 9, type = 'resize'}: StickerOptions){
+    try {
+        const bufferSticker = await stickerCreation(mediaBuffer, {pack, author, fps, type}).catch(()=>{
+            throw new Error("Houve um erro ao criar o sticker, use outra foto/video ou tente novamente mais tarde.")
         })
-    })
+
+        return bufferSticker
+    } catch(err){
+        throw err
+    }
 }
 
-export function renameSticker(stickerBuffer: Buffer, pack: string, author: string){
-    return new Promise <Buffer>((resolve)=>{
-        addExif(stickerBuffer, pack, author).then((stickerBufferModified)=>{
-            resolve(stickerBufferModified)
-        }).catch(() =>{
-            throw new Error('Houve um erro ao renomear o sticker.')
+export async function renameSticker(stickerBuffer: Buffer, pack: string, author: string){
+    try {
+        const stickerBufferModified = await addExif(stickerBuffer, pack, author).catch(()=>{
+            throw new Error('Houve um erro ao renomear o sticker, use outro sticker ou tente novamente mais tarde.')
         })
-    })
+
+        return stickerBufferModified
+    } catch(err){
+        throw err
+    }
 }
 
-export function stickerToImage(stickerBuffer: Buffer){
-    return new Promise <Buffer>((resolve)=>{
+export async function stickerToImage(stickerBuffer: Buffer){
+    try {
         const inputWebpPath = getTempPath('webp')
         const outputPngPath = getTempPath('png')
         fs.writeFileSync(inputWebpPath, stickerBuffer)
-        ffmpeg(inputWebpPath)
-        .save(outputPngPath)
-        .on('end', ()=>{
-            const imageBuffer = fs.readFileSync(outputPngPath)
-            fs.unlinkSync(inputWebpPath)
-            fs.unlinkSync(outputPngPath)
-            resolve(imageBuffer)
+
+        await new Promise <void>((resolve, reject) => {
+            ffmpeg(inputWebpPath)
+            .save(outputPngPath)
+            .on('end', () => resolve())
+            .on('error', () => reject())
+        }).catch(()=>{
+            throw new Error('Houve um erro ao converter o sticker para imagem, use outro sticker ou tente novamente mais tarde.')
         })
-        .on('error', ()=>{
-            throw new Error('Houve um erro ao converter o sticker para imagem')
-        })
-    })
+
+        const imageBuffer = fs.readFileSync(outputPngPath)
+        fs.unlinkSync(inputWebpPath)
+        fs.unlinkSync(outputPngPath)
+
+        return imageBuffer
+    } catch(err){
+        throw err
+    }
 }
 
 async function stickerCreation(mediaBuffer : Buffer, {author, pack, fps, type} : StickerOptions){
@@ -58,6 +68,7 @@ async function stickerCreation(mediaBuffer : Buffer, {author, pack, fps, type} :
         const isAnimated = mime.startsWith('video') || mime.includes('gif') 
         const webpBuffer = await webpConvertion(mediaBuffer, isAnimated, fps, type)
         const stickerBuffer = await addExif(webpBuffer, pack, author)
+
         return stickerBuffer
     } catch(err){
         throw err
@@ -76,14 +87,15 @@ async function addExif(buffer: Buffer, pack: string, author: string){
         await img.load(buffer)
         img.exif = exif
         const stickerBuffer : Buffer = await img.save(null)
+
         return stickerBuffer
     } catch(err){
         throw err
     }
 }
 
-function webpConvertion(mediaBuffer : Buffer, isAnimated: boolean, fps: number, type : StickerType){
-    return new Promise <Buffer> (async (resolve)=>{
+async function webpConvertion(mediaBuffer : Buffer, isAnimated: boolean, fps: number, type : StickerType){
+    try {
         let inputMediaPath
         let options
         let outputMediaPath = getTempPath('webp')
@@ -116,20 +128,30 @@ function webpConvertion(mediaBuffer : Buffer, isAnimated: boolean, fps: number, 
 
         fs.writeFileSync(inputMediaPath, mediaBuffer)
 
-        ffmpeg(inputMediaPath).outputOptions(options).save(outputMediaPath).on('end', async ()=>{
-            let webpBuffer = fs.readFileSync(outputMediaPath)
-            fs.unlinkSync(outputMediaPath)
-            fs.unlinkSync(inputMediaPath)
-            resolve(webpBuffer)
-        }).on('error', async (err)=>{
+        await new Promise <void>((resolve, reject) => {
+            ffmpeg(inputMediaPath)
+            .outputOptions(options)
+            .save(outputMediaPath)
+            .on('end', () => resolve())
+            .on('error', (err) => reject(err))
+        }).catch((err)=>{
             fs.unlinkSync(inputMediaPath)
             throw err
         })
-    })
+
+        const webpBuffer = fs.readFileSync(outputMediaPath)
+        fs.unlinkSync(outputMediaPath)
+        fs.unlinkSync(inputMediaPath)
+
+        return webpBuffer
+    } catch(err){
+        throw err
+    }
 }
 
 async function editImage(imageBuffer: Buffer, type: StickerType){
     const image = await jimp.read(imageBuffer)
+    
     if(type === 'resize'){
         image['resize'](512,512)
     } else if (type === 'contain'){
@@ -138,5 +160,6 @@ async function editImage(imageBuffer: Buffer, type: StickerType){
         image['resize'](512,512)
         image.circle()
     }
+
     return image.getBufferAsync('image/png')
 }
