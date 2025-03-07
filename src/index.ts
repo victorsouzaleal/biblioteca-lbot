@@ -7,7 +7,7 @@ import * as audioLibrary from './lib/audio.js'
 import * as downloadLibrary from './lib/download.js'
 import * as generalLibrary from './lib/general.js'
 import * as imageLibrary from './lib/image.js'
-import * as videoLibrary from './lib/video.js'
+import * as convertLibrary from './lib/convert.js'
 import * as stickerLibrary from './lib/sticker.js'
 
-export {audioLibrary, downloadLibrary, generalLibrary, imageLibrary, videoLibrary, stickerLibrary}
+export {audioLibrary, downloadLibrary, generalLibrary, imageLibrary, convertLibrary, stickerLibrary}

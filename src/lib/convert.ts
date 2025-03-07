@@ -3,18 +3,18 @@ import fs from 'fs-extra'
 import axios from 'axios'
 import {getTempPath} from './util.js'
 
-export async function convertMP4ToMP3 (mediaType: 'buffer' | 'url',  media: Buffer | string){
+export async function convertMp4ToMp3 (sourceType: 'buffer' | 'url',  video: Buffer | string){
     try {
         const inputVideoPath = getTempPath('mp4')
         const outputAudioPath = getTempPath('mp3')
 
-        if(mediaType == 'buffer'){
-            if(!Buffer.isBuffer(media)) throw new Error("O tipo selecionado da mídia foi Buffer mas a mídia não é um Buffer.")
-            fs.writeFileSync(inputVideoPath, media)
-        } else if (mediaType == 'url'){
-            if(typeof media != 'string') throw new Error("O tipo selecionado da mídia foi URL mas a mídia não é uma URL.")
+        if(sourceType == 'buffer'){
+            if(!Buffer.isBuffer(video)) throw new Error("O tipo selecionado da mídia foi Buffer mas a mídia não é um Buffer.")
+            fs.writeFileSync(inputVideoPath, video)
+        } else if (sourceType == 'url'){
+            if(typeof video != 'string') throw new Error("O tipo selecionado da mídia foi URL mas a mídia não é uma URL.")
 
-            const {data : mediaResponse} = await axios.get(media, {responseType: 'arraybuffer'}).catch(() => {
+            const {data : mediaResponse} = await axios.get(video, {responseType: 'arraybuffer'}).catch(() => {
                 throw new Error("Houve um erro ao fazer download do vídeo para converter para MP3.")
             })
 
@@ -45,30 +45,30 @@ export async function convertMP4ToMP3 (mediaType: 'buffer' | 'url',  media: Buff
     }
 }
 
-export async function videoThumbnail(videoMedia : string | Buffer, type : "file"|"buffer"|"url"){
+export async function convertVideoToThumbnail(sourceType : "file"|"buffer"|"url", video : Buffer | string){
     try{
         let inputPath : string | undefined
         const outputThumbnailPath = getTempPath('jpg')
 
-        if(type == "file"){
-            if(typeof videoMedia !== 'string'){
+        if(sourceType == "file"){
+            if(typeof video !== 'string'){
                 throw new Error('O tipo de operação está definido como FILE mas a mídia enviada não é um caminho de arquivo válido.')
             }
 
-            inputPath = videoMedia
-        } else if(type == "buffer"){
-            if(!Buffer.isBuffer(videoMedia)) {
+            inputPath = video
+        } else if(sourceType == "buffer"){
+            if(!Buffer.isBuffer(video)) {
                 throw new Error('O tipo de operação está definido como BUFFER mas a mídia enviada não é um buffer válido.')
             }
 
             inputPath = getTempPath('mp4')
-            fs.writeFileSync(inputPath, videoMedia)
-        } else if(type == "url"){
-            if(typeof videoMedia !== 'string') {
+            fs.writeFileSync(inputPath, video)
+        } else if(sourceType == "url"){
+            if(typeof video !== 'string') {
                 throw new Error('O tipo de operação está definido como URL mas a mídia enviada não é uma url válida.')
             }
 
-            const responseUrlBuffer = await axios.get(videoMedia,  { responseType: 'arraybuffer' }).catch(()=>{
+            const responseUrlBuffer = await axios.get(video,  { responseType: 'arraybuffer' }).catch(()=>{
                 throw new Error("Houve um erro ao fazer download da mídia para a thumbnail, tente novamente mais tarde.")
             })
             
@@ -89,7 +89,7 @@ export async function videoThumbnail(videoMedia : string | Buffer, type : "file"
             throw new Error("Houve um erro ao conversão a mídia para thumbnail, tente novamente mais tarde.")
         })
 
-        if(type != 'file' && inputPath) {
+        if(sourceType != 'file' && inputPath) {
             fs.unlinkSync(inputPath)
         }
 
@@ -100,4 +100,4 @@ export async function videoThumbnail(videoMedia : string | Buffer, type : "file"
     } catch(err){
         throw err
     }
-  }
+}

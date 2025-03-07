@@ -1,6 +1,5 @@
 import fs from 'fs-extra'
-import {getTempPath, formatSeconds} from './util.js'
-import {convertMP4ToMP3} from './video.js'
+import {formatSeconds} from './util.js'
 import Youtube from 'youtube-sr'
 import ytdl from '@distube/ytdl-core'
 import {instagramGetUrl} from 'instagram-url-direct'

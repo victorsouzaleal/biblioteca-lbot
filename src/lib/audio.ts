@@ -1,7 +1,7 @@
 import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs-extra'
 import {getTempPath} from './util.js'
-import {convertMP4ToMP3} from './video.js'
+import { convertMp4ToMp3 } from './convert.js'
 import duration from 'format-duration-time'
 import {createClient} from '@deepgram/sdk'
 import tts from 'node-gtts'
@@ -125,7 +125,7 @@ export async function musicRecognition (mediaBuffer : Buffer, {acr_host , acr_ac
         let audioBuffer : Buffer | undefined
         
         if(mime.startsWith('video')) {
-            audioBuffer = await convertMP4ToMP3('buffer', mediaBuffer)
+            audioBuffer = await convertMp4ToMp3('buffer', mediaBuffer)
         } else {
             audioBuffer = mediaBuffer
         }
