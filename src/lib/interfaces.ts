@@ -41,7 +41,7 @@ export interface InstagramMedia {
     likes: number,
     media: {
         type : "video" | "image",
-        buffer : Buffer
+        url : string
     }[]
 }
 
@@ -54,7 +54,9 @@ export interface YTInfo {
     keywords?: string[],
     id_channel: string,
     duration_formatted: string,
-    format: ytdl.videoFormat
+    format: ytdl.videoFormat,
+    url: string
+    
 }
 
 

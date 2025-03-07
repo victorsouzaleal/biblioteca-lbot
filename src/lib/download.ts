@@ -97,10 +97,9 @@ export async function instagramMedia (url: string){
         }
 
         for (const url of instagramResponse.url_list) {
-            const {data, headers} = await axios.get(url, { responseType: 'arraybuffer' })
-            const buffer = Buffer.from(data, 'utf-8')
+            const {headers} = await axios.head(url)
             const type = headers['content-type'] === 'video/mp4' ? 'video' : 'image'
-            instagramMedia.media.push({type, buffer})                  
+            instagramMedia.media.push({type, url})                  
         }
 
         return instagramMedia
@@ -109,7 +108,7 @@ export async function instagramMedia (url: string){
     }
 }
 
-export async function ytInfo (text : string){
+export async function youtubeMedia (text : string){
     try {
         const isURLValid = ytdl.validateURL(text)
         let videoId : string | undefined
@@ -147,7 +146,8 @@ export async function ytInfo (text : string){
             id_channel: videoInfo.player_response.videoDetails.channelId,
             is_live: videoInfo.player_response.videoDetails.isLiveContent,
             duration_formatted: formatSeconds(parseInt(videoInfo.player_response.videoDetails.lengthSeconds)),
-            format
+            format: format,
+            url: format.url
         }
         
         return ytInfo
@@ -155,37 +155,3 @@ export async function ytInfo (text : string){
         throw err
     }
 }
-
-export async function ytMP4 (videoInfo : YTInfo){
-    try {
-        const videoOutputFile = getTempPath('mp4')
-        const videoStream = ytdl(videoInfo?.id_video, {format: videoInfo?.format, agent: yt_agent})
-        videoStream.pipe(fs.createWriteStream(videoOutputFile))
-
-        await new Promise <void> ((resolve, reject) => {
-            videoStream.on("end", () => resolve())
-            videoStream.on("error", () => reject())
-        }).catch(() => {
-            throw new Error("Houve um erro ao fazer o download do vídeo.")
-        })
-
-        const videoBuffer = fs.readFileSync(videoOutputFile)
-        fs.unlinkSync(videoOutputFile)
-        
-        return videoBuffer
-    } catch(err){
-        throw err
-    } 
-}
-
-export async function ytMP3 (videoInfo: YTInfo){
-    try {
-        const videoBuffer = await ytMP4(videoInfo)
-        const audioBuffer = await convertMP4ToMP3(videoBuffer)
-
-        return audioBuffer
-    } catch(err) {
-        throw err
-    }
-}
-
