@@ -9,7 +9,7 @@ export interface MusicRecognition {
     artists: string
 }
 
-export interface TwitterMedia {
+export interface XMedia {
     text: string,
     media: {
         type: "video" | "image",
