@@ -145,6 +145,7 @@ export async function ytInfo (text : string){
             duration: videoInfo.player_response.videoDetails.lengthSeconds,
             keywords: videoInfo.player_response.videoDetails.keywords,
             id_channel: videoInfo.player_response.videoDetails.channelId,
+            is_live: videoInfo.player_response.videoDetails.isLiveContent,
             duration_formatted: formatSeconds(parseInt(videoInfo.player_response.videoDetails.lengthSeconds)),
             format
         }

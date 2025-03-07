@@ -50,6 +50,7 @@ export interface YTInfo {
     title: string,
     description: string,
     duration: string,
+    is_live: boolean,
     keywords?: string[],
     id_channel: string,
     duration_formatted: string,
