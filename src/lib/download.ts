@@ -155,10 +155,9 @@ export async function ytInfo (text : string){
     }
 }
 
-export async function ytMP4 (text : string){
+export async function ytMP4 (videoInfo : YTInfo){
     try {
         const videoOutputFile = getTempPath('mp4')
-        const videoInfo = await ytInfo(text)
         const videoStream = ytdl(videoInfo?.id_video, {format: videoInfo?.format, agent: yt_agent})
         videoStream.pipe(fs.createWriteStream(videoOutputFile))
 
@@ -178,9 +177,9 @@ export async function ytMP4 (text : string){
     } 
 }
 
-export async function ytMP3 (text : string){
+export async function ytMP3 (videoInfo: YTInfo){
     try {
-        const videoBuffer = await ytMP4(text)
+        const videoBuffer = await ytMP4(videoInfo)
         const audioBuffer = await convertMP4ToMP3(videoBuffer)
 
         return audioBuffer
