@@ -125,7 +125,7 @@ export async function musicRecognition (mediaBuffer : Buffer, {acr_host , acr_ac
         let audioBuffer : Buffer | undefined
         
         if(mime.startsWith('video')) {
-            audioBuffer = await convertMP4ToMP3(mediaBuffer)
+            audioBuffer = await convertMP4ToMP3('buffer', mediaBuffer)
         } else {
             audioBuffer = mediaBuffer
         }

@@ -3,12 +3,27 @@ import fs from 'fs-extra'
 import axios from 'axios'
 import {getTempPath} from './util.js'
 
-export async function convertMP4ToMP3 (videoBuffer: Buffer){
+export async function convertMP4ToMP3 (mediaType: 'buffer' | 'url',  media: Buffer | string){
     try {
         const inputVideoPath = getTempPath('mp4')
-        fs.writeFileSync(inputVideoPath, videoBuffer)
         const outputAudioPath = getTempPath('mp3')
 
+        if(mediaType == 'buffer'){
+            if(!Buffer.isBuffer(media)) throw new Error("O tipo selecionado da mídia foi Buffer mas a mídia não é um Buffer.")
+            fs.writeFileSync(inputVideoPath, media)
+        } else if (mediaType == 'url'){
+            if(typeof media != 'string') throw new Error("O tipo selecionado da mídia foi URL mas a mídia não é uma URL.")
+
+            const {data : mediaResponse} = await axios.get(media, {responseType: 'arraybuffer'}).catch(() => {
+                throw new Error("Houve um erro ao fazer download do vídeo para converter para MP3.")
+            })
+
+            const videoBuffer = Buffer.from(mediaResponse)
+            fs.writeFileSync(inputVideoPath, videoBuffer)
+        } else {
+            throw new Error("Tipo de mídia não suportada.")
+        }
+        
         await new Promise <void> ((resolve, reject)=>{
             ffmpeg(inputVideoPath)
             .outputOptions(['-vn', '-codec:a libmp3lame', '-q:a 3'])
