@@ -49,7 +49,7 @@ export interface YTInfo {
     id_video: string,
     title: string,
     description: string,
-    duration: string,
+    duration: number,
     is_live: boolean,
     keywords?: string[],
     id_channel: string,
