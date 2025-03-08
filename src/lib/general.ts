@@ -32,7 +32,7 @@ export async function simSimi(text: string){
             }
         })
 
-        return simiResponse.message
+        return simiResponse.message as string
     } catch(err){
         throw err
     }
