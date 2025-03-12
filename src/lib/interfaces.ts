@@ -135,11 +135,6 @@ export interface CurrencyConvert {
     }[]
 }
 
-export interface DDD {
-    state: string,
-    region: string
-}
-
 export interface AnimeRecognition {
     initial_time : string,
     final_time : string,
@@ -175,11 +170,6 @@ export type StickerOptions = {
     pack: string, 
     fps: number, 
     type : StickerType
-}
-
-export interface TruthMachine {
-    calibration: Buffer,
-    result: Buffer
 }
 
 export type AudioModificationType = "estourar" | "reverso" | "grave" | "agudo" | "x2" | "volume"

@@ -25,19 +25,13 @@ export async function emojiMix(emoji1: string, emoji2: string){
         const isSupportedEmoji1  = checkSupported(emoji1, true)
         const isSupportedEmoji2  = checkSupported(emoji2, true)
 
-        if(!isSupportedEmoji1 && !isSupportedEmoji2 ){
-            throw new Error(`${emoji1} e ${emoji2} não são válidos para a união.`)
-        } else if(!isSupportedEmoji1){
-            throw new Error(`${emoji1} não é válido para a união.`)
-        } else if (!isSupportedEmoji2){
-            throw new Error(`${emoji2} não é válido para a união`)
-        }
+        if(!isSupportedEmoji1 && !isSupportedEmoji2 ) throw new Error(`${emoji1} e ${emoji2} não são válidos para a união.`)
+        else if(!isSupportedEmoji1) throw new Error(`${emoji1} não é válido para a união.`)
+        else if (!isSupportedEmoji2) throw new Error(`${emoji2} não é válido para a união`)
 
         const emojiUrl = getEmojiMixUrl(emoji1, emoji2, false, true)
 
-        if(!emojiUrl) {
-            throw new Error("Emojis não compatíveis para união")
-        }
+        if(!emojiUrl) throw new Error("Emojis não compatíveis para união")
         
         const { data : imageBuffer} = await axios.get(emojiUrl, {responseType: 'arraybuffer'}).catch(() => {
             throw new Error("Houve um erro ao realizar o download de emojis, tente novamente mais tarde.")
@@ -79,9 +73,7 @@ export async function removeBackground(imageBuffer: Buffer){
             throw new Error("Houve um erro ao realizar o upload da imagem, tente novamente mais tarde.")
         })
 
-        if(!uploadResponse.isSuccess) {
-            throw new Error("Tamanho da foto excedeu o limite")
-        }
+        if(!uploadResponse.isSuccess) throw new Error("Tamanho da foto excedeu o limite")
 
         const formDataRemoveBg = new FormData()
         formDataRemoveBg.append('name', uploadResponse.files[0].name)
@@ -133,13 +125,9 @@ export async function animeRecognition(imageBuffer : Buffer){
         }
 
         const animesResponse = await fetch(URL_BASE, requestConfig).catch((err)=>{
-            if(err.status == 429){
-                throw new Error('Muitas solicitações sendo feitas, tente novamente mais tarde.')
-            } else if(err.status == 400){
-                throw new Error('Não foi possível achar resultados para esta imagem')
-            } else {
-                throw new Error('Houve um erro ao obter reconhecimento do anime, tente novamente mais tarde.')
-            }
+            if(err.status == 429) throw new Error('Muitas solicitações sendo feitas, tente novamente mais tarde.')
+            else if(err.status == 400) throw new Error('Não foi possível achar resultados para esta imagem')
+            else throw new Error('Houve um erro ao obter reconhecimento do anime, tente novamente mais tarde.')
         })
 
         const {result : animes} = await animesResponse.json()
@@ -168,10 +156,8 @@ export async function imageSearchGoogle(text: string){
             throw new Error("Houve um erro ao obter imagens, tente novamente mais tarde.")
         })
 
-        if(!images.length) {
-            throw new Error("Nenhum resultado foi encontrado para esta pesquisa.")
-        }
-            
+        if(!images.length) throw new Error("Nenhum resultado foi encontrado para esta pesquisa.")
+        
         for (let image of images){
             if(image.preview) imagesResult.push(image)
         }

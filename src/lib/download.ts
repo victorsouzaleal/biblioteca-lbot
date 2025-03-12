@@ -42,9 +42,7 @@ export async function tiktokMedia (url : string){
             throw new Error("Houve um erro ao tentar obter os dados do Tiktok, verifique o link ou tente mais tarde.")
         })
 
-        if(tiktokResponse.status === 'error') {
-            throw new Error("Houve um erro ao obter as mídias desse link, verifique o link ou tente mais tarde.")
-        }
+        if(tiktokResponse.status === 'error') throw new Error("Houve um erro ao obter as mídias desse link, verifique o link ou tente mais tarde.")
 
         const tiktokMedia : TiktokMedia = {
             author_profile: tiktokResponse.result?.author.nickname,
@@ -122,16 +120,11 @@ export async function youtubeMedia (text : string){
             videoId = videoIdFound
         }
 
-        if(!videoId){
-            throw new Error('Houve um erro ao obter o ID do vídeo.')
-        }
+        if(!videoId) throw new Error('Houve um erro ao obter o ID do vídeo.')
 
         const videoInfo = await ytdl.getInfo(videoId, { playerClients: ["WEB", "WEB_EMBEDDED", "ANDROID", "IOS"], agent: yt_agent }).catch((err) => {
-            if(err.message == "Status code: 410") {
-                throw new Error ('O video parece ter restrição de idade ou precisa de ter login para assistir.')
-            } else {
-                throw err
-            }
+            if(err.message == "Status code: 410") throw new Error ('O video parece ter restrição de idade ou precisa de ter login para assistir.')
+            else throw err
         })
 
         const formats = ytdl.filterFormats(videoInfo.formats, "videoandaudio");

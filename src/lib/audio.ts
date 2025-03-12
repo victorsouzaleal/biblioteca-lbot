@@ -16,9 +16,7 @@ export async function textToVoice (lang: "pt" | 'en' | 'ja' | 'es' | 'it' | 'ru'
         const audioPath = getTempPath("mp3")
 
         await new Promise <void>((resolve) =>{
-            tts(lang).save(audioPath, text, ()=>{
-                resolve()
-            })
+            tts(lang).save(audioPath, text, ()=> resolve())
         }).catch(() =>{
             throw new Error("Houve um erro ao converter texto para voz, tente novamente mais tarde.")
         })
@@ -45,10 +43,8 @@ export async function audioTranscription (audioBuffer : Buffer, {deepgram_secret
             throw new Error("Houve um erro ao obter a transcrição do áudio, use outro aúdio ou tente novamente mais tarde.")
         })
         
-        if(error) {
-            throw new Error("Houve um erro ao obter a transcrição do áudio, use outro aúdio ou tente novamente mais tarde.")
-        }
-
+        if(error) throw new Error("Houve um erro ao obter a transcrição do áudio, use outro aúdio ou tente novamente mais tarde.")
+    
         return result.results.channels[0].alternatives[0].transcript
     } catch(err){
         throw err
@@ -66,27 +62,21 @@ export async function audioModified (audioBuffer: Buffer, type: AudioModificatio
             case "estourar":
                 options = ["-y", "-filter_complex", "acrusher=level_in=3:level_out=5:bits=10:mode=log:aa=1"] 
                 break
-
             case "reverso":
                 options = ["-y", "-filter_complex", "areverse"]
                 break
-
             case "grave":
                 options = ["-y", "-af", "asetrate=44100*0.8"]
                 break
-
             case "agudo":
                 options = ["-y", "-af", "asetrate=44100*1.4"]
                 break
-
             case "x2":
                 options = ["-y", "-filter:a", "atempo=2.0", "-vn"]
                 break
-
             case "volume":
                 options = ["-y", "-filter:a", "volume=4.0"]
                 break
-
             default:
                 fs.unlinkSync(inputAudioPath)
                 throw new Error(`Esse tipo de edição não é suportado`)
@@ -118,17 +108,12 @@ export async function musicRecognition (mediaBuffer : Buffer, {acr_host , acr_ac
         const URL_BASE = 'https://identify-eu-west-1.acrcloud.com/v1/identify'
         const {mime} = await fileTypeFromBuffer(mediaBuffer) as FileTypeResult
     
-        if(!mime.startsWith('video') && !mime.startsWith('audio')){
-            throw new Error('Esse tipo de arquivo não é suportado.')
-        }
-
+        if(!mime.startsWith('video') && !mime.startsWith('audio')) throw new Error('Esse tipo de arquivo não é suportado.')
+    
         let audioBuffer : Buffer | undefined
         
-        if(mime.startsWith('video')) {
-            audioBuffer = await convertMp4ToMp3('buffer', mediaBuffer)
-        } else {
-            audioBuffer = mediaBuffer
-        }
+        if(mime.startsWith('video')) audioBuffer = await convertMp4ToMp3('buffer', mediaBuffer)
+        else audioBuffer = mediaBuffer
 
         const formData = new FormData()
         formData.append('host', acr_host?.trim())
@@ -146,20 +131,14 @@ export async function musicRecognition (mediaBuffer : Buffer, {acr_host , acr_ac
             throw new Error('Houve um erro ao obter o reconhecimento de música, tente novamente mais tarde.')
         })
 
-        if(recognitionResponse.status.code == 1001) {
-            throw new Error('Não foi encontrada uma música compatível.')
-        } else if(recognitionResponse.status.code == 3003 || recognitionResponse.status.code == 3015) {
-            throw new Error("Você excedeu o limite do ACRCloud, crie uma nova chave no site")
-        } else if (recognitionResponse.status.code == 3000) {
-            throw new Error('Houve um erro no servidor do ACRCloud, tente novamente mais tarde')
-        }
-    
+        if(recognitionResponse.status.code == 1001) throw new Error('Não foi encontrada uma música compatível.')
+        else if(recognitionResponse.status.code == 3003 || recognitionResponse.status.code == 3015) throw new Error("Você excedeu o limite do ACRCloud, crie uma nova chave no site")
+        else if (recognitionResponse.status.code == 3000) throw new Error('Houve um erro no servidor do ACRCloud, tente novamente mais tarde')
+
         let arrayReleaseDate = recognitionResponse.metadata.music[0].release_date.split("-")
         let artists : string[] = []
 
-        for(let artist of recognitionResponse.metadata.music[0].artists){
-            artists.push(artist.name)
-        }
+        for(let artist of recognitionResponse.metadata.music[0].artists) artists.push(artist.name)
 
         const musicRecognition : MusicRecognition = {
             producer : recognitionResponse.metadata.music[0].label || "-----",

@@ -60,9 +60,7 @@ async function stickerCreation(mediaBuffer : Buffer, {author, pack, fps, type} :
     try{
         const bufferData = await fileTypeFromBuffer(mediaBuffer)
 
-        if(!bufferData) {
-            throw new Error("Não foi possível obter os dados do mídia enviada.")
-        }
+        if(!bufferData) throw new Error("Não foi possível obter os dados do mídia enviada.")
 
         const mime = bufferData.mime
         const isAnimated = mime.startsWith('video') || mime.includes('gif') 
@@ -152,11 +150,9 @@ async function webpConvertion(mediaBuffer : Buffer, isAnimated: boolean, fps: nu
 async function editImage(imageBuffer: Buffer, type: StickerType){
     const image = await jimp.read(imageBuffer)
     
-    if(type === 'resize'){
-        image['resize'](512,512)
-    } else if (type === 'contain'){
-        image['contain'](512,512)
-    } else if(type === 'circle'){
+    if(type === 'resize') image['resize'](512,512)
+    else if (type === 'contain') image['contain'](512,512)
+    else if(type === 'circle'){
         image['resize'](512,512)
         image.circle()
     }

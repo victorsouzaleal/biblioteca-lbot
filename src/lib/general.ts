@@ -10,7 +10,7 @@ import { timestampToDate } from './util.js'
 import {obterDadosBrasileiraoA, obterDadosBrasileiraoB, DadosBrasileirao} from '@victorsouzaleal/brasileirao'
 import {JSDOM} from 'jsdom'
 import UserAgent from 'user-agents'
-import { AnimeRelease, CurrencyConvert, DDD, MangaRelease, MusicLyrics, News, TruthMachine, WebSearch, Wheather } from './interfaces.js'
+import { AnimeRelease, CurrencyConvert, MangaRelease, MusicLyrics, News, WebSearch, Wheather } from './interfaces.js'
 import path from 'node:path'
 const mediaPath = path.resolve(import.meta.dirname, '..', 'media')
 
@@ -25,11 +25,8 @@ export async function simSimi(text: string){
         }
 
         const {data : simiResponse} = await axios(config).catch((err)=>{
-            if(err.response?.data?.message){
-                return err.response.data
-            } else {
-                throw new Error("Houve um erro ao obter resposta do SimSimi, tente novamente mais tarde.")
-            }
+            if(err.response?.data?.message) return err.response.data
+            else throw new Error("Houve um erro ao obter resposta do SimSimi, tente novamente mais tarde.")
         })
 
         return simiResponse.message as string
@@ -55,16 +52,14 @@ export async function animeReleases(){
             let episode = $anime.querySelector('a > div.limit > div.bt > span.epx')?.innerHTML
             let url = $anime.querySelector('a')?.href
 
-            if(!name || !episode || !url){
-                throw new Error("Houve um erro ao coletar os dados dos animes.")
-            } else {
-                name = name.split("Episódio")[0]
-                animes.push({
-                    name,
-                    episode,
-                    url
-                })
-            }
+            if(!name || !episode || !url) throw new Error("Houve um erro ao coletar os dados dos animes.")
+
+            name = name.split("Episódio")[0]
+            animes.push({
+                name,
+                episode,
+                url
+            })
         })
 
         return animes
@@ -90,15 +85,13 @@ export async function mangaReleases(){
             let chapter = $manga.querySelector('h3.chapter-title > span.chapter-name')?.innerHTML.trim()
             let url = `https://mangabr.net${$manga.querySelector('a.link-chapter')?.getAttribute('href')}`
             
-            if(!name || !chapter){
-                throw new Error("Houve um erro ao coletar os dados dos mangás.")
-            } else {
-                mangas.push({
-                    name,
-                    chapter,
-                    url
-                })
-            }
+            if(!name || !chapter) throw new Error("Houve um erro ao coletar os dados dos mangás.")
+
+            mangas.push({
+                name,
+                chapter,
+                url
+            })
         })
 
         return mangas
@@ -121,10 +114,8 @@ export async function brasileiraoTable(serie : "A" | "B"){
             })
         } 
         
-        if(!table){
-            throw new Error("Série não suportada")
-        } 
-        
+        if(!table) throw new Error("Série não suportada")
+    
         return table
     } catch(err) {
         throw err
@@ -165,10 +156,8 @@ export async function calcExpression(expr: string){
 
         let calcResult = calcResponse.result;
 
-        if(calcResult == "NaN" || calcResult == "Infinity") {
-            throw new Error('Foi feita uma divisão por 0 ou algum outro cálculo inválido.')
-        }
-
+        if(calcResult == "NaN" || calcResult == "Infinity") throw new Error('Foi feita uma divisão por 0 ou algum outro cálculo inválido.')
+        
         calcResult = calcResult.split(" ")
         calcResult[0] = (calcResult[0].includes("e")) ? prettyNum(calcResult[0]) : calcResult[0]
         calcResult = calcResult.join(" ")
@@ -222,10 +211,8 @@ export async function shortenUrl(url: string){
             throw new Error(`Houve um erro ao obter link encurtado, tente novamente mais tarde.`)
         })
 
-        if(!shortenResponse.data) {
-            throw new Error(`O link inserido é inválido e não foi possível encurtar.`)
-        }
-
+        if(!shortenResponse.data) throw new Error(`O link inserido é inválido e não foi possível encurtar.`)
+        
         return shortenResponse.data as string
     } catch(err) {
         throw err
@@ -238,9 +225,7 @@ export async function webSearchGoogle(texto: string){
             throw new Error("Houve um erro ao obter a pesquisa do Google, tente novamente mais tarde.")
         })
 
-        if(!searchResults.length) {
-            throw new Error ("Não foram encontrados resultados para esta pesquisa.")
-        } 
+        if(!searchResults.length) throw new Error ("Não foram encontrados resultados para esta pesquisa.")
 
         let searchResponse : WebSearch[] = []
 
@@ -329,11 +314,8 @@ export async function musicLyrics(text: string){
         const geniusClient = new Genius.Client()
 
         const musicSearch = await geniusClient.songs.search(text).catch((err) => {
-            if(err.message == "No result was found"){
-                throw new Error("A letra da música não foi encontrada")
-            } else {
-                throw new Error("Houve um erro ao obter a letra da música, tente novamente mais tarde.")
-            }
+            if(err.message == "No result was found") throw new Error("A letra da música não foi encontrada")
+            else throw new Error("Houve um erro ao obter a letra da música, tente novamente mais tarde.")
         })
 
         const musicResult : MusicLyrics = {
@@ -355,12 +337,9 @@ export async function convertCurrency(currency: "dolar" | "euro" | "real" | "ien
         value = parseInt(value.toString().replace(",","."))
         let params : string | undefined
 
-        if(isNaN(value)){
-            throw new Error('O valor não é um número válido.')
-        } else if(value > 1000000000000000){
-            throw new Error('Quantidade muito alta, você provavelmente não tem todo esse dinheiro.')
-        }  
-        
+        if(isNaN(value)) throw new Error('O valor não é um número válido.')
+        else if(value > 1000000000000000)throw new Error('Quantidade muito alta, você provavelmente não tem todo esse dinheiro.')
+    
         switch(currency){
             case 'dolar':
                 params = "USD-BRL,USD-EUR,USD-JPY"
@@ -432,18 +411,15 @@ export async function cardsAgainstHumanity(){
         const URL_BASE = 'https://gist.githubusercontent.com/victorsouzaleal/bfbafb665a35436acc2310d51d754abb/raw/df5eee4e8abedbf1a18f031873d33f1e34ac338a/cartas.json'
          
         const {data : cards} = await axios.get(URL_BASE).catch(() => {
-            throw new Error("Houve um erro ao obter a frase contra humanidade, tente novamente mais tarde.")
+            throw new Error("Houve um erro ao obter a frase, tente novamente mais tarde.")
         })
 
         let blackCardChosen = cards.cartas_pretas[Math.floor(Math.random() * cards.cartas_pretas.length)]
         let cont_params = 1
 
-        if(blackCardChosen.indexOf("{p3}") != -1){
-            cont_params = 3
-        } else if(blackCardChosen.indexOf("{p2}") != -1){
-            cont_params = 2
-        }     
-
+        if(blackCardChosen.indexOf("{p3}") != -1) cont_params = 3
+        else if(blackCardChosen.indexOf("{p2}") != -1) cont_params = 2
+    
         for(let i = 1; i <= cont_params; i++){
             let whiteCardChosen = cards.cartas_brancas[Math.floor(Math.random() * cards.cartas_brancas.length)]
             blackCardChosen = blackCardChosen.replace(`{p${i}}`, `*${whiteCardChosen}*`)
@@ -467,16 +443,12 @@ export async function infoDDD(ddd: string){
         const states = dddResponse.estados
         const indexDDD = states.findIndex((state : { ddd: string }) => state.ddd.includes(ddd))
 
-        if(indexDDD === -1) {
-            throw new Error("Este DDD não foi encontrado, certifique-se que ele é válido.")
-        }
+        if(indexDDD === -1) throw new Error("Este DDD não foi encontrado, certifique-se que ele é válido.")
 
-        const dddResult : DDD = {
+        return {
             state: states[indexDDD].nome,
             region: states[indexDDD].regiao
         }
-
-        return dddResult
     } catch(err) {
         throw err
     }
@@ -502,12 +474,11 @@ export function truthMachine(){
         const calibrationImageBuffer = fs.readFileSync(path.join(mediaPath, 'calibrando.png'))
         const filenameChosen = FILENAMES[Math.floor(Math.random() * FILENAMES.length)]
         const resultImageBuffer = fs.readFileSync(path.join(mediaPath, filenameChosen))
-        const truthMachineResult : TruthMachine = {
-            calibration : calibrationImageBuffer,
-            result : resultImageBuffer
-        }
 
-        return truthMachineResult
+        return {
+            calibration_image : calibrationImageBuffer,
+            result_image : resultImageBuffer
+        }
     } catch(err) {
         throw new Error("Houve um erro ao obter as imagens da máquina da verdade, tente novamente mais tarde.")
     }
@@ -519,7 +490,10 @@ export function flipCoin(){
         const filenameChosen = FILENAMES[Math.floor(Math.random() * FILENAMES.length)]
         const resultImageBuffer = fs.readFileSync(path.join(mediaPath, filenameChosen))
 
-        return resultImageBuffer
+        return {
+            result : filenameChosen.replace(".png", ''),
+            image : resultImageBuffer
+        }
     } catch(err) {
         throw new Error("Houve um erro ao obter as imagem do lado da moeda, tente novamente mais tarde.")
     }

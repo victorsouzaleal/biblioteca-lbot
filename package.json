@@ -42,6 +42,7 @@
     "fs-extra": "^9.0.1",
     "genius-lyrics": "^4.2.9",
     "google-sr": "^5.0.0",
+    "hercai": "^13.0.0",
     "instagram-url-direct": "^2.0.1",
     "jimp": "^0.22.12",
     "jsdom": "^24.1.1",
