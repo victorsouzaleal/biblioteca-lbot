@@ -23,7 +23,7 @@
     "prepublishOnly": "npm run build",
     "prepack": "npm run build",
     "build": "tsc",
-    "postbuild": "copyfiles -f ./src/media/*.png ./dist/media & rollup ./dist/index.js --format cjs --file ./dist/index.cjs "
+    "postbuild": "rollup ./dist/index.js --format cjs --file ./dist/index.cjs"
   },
   "dependencies": {
     "@deepgram/sdk": "^3.5.1",

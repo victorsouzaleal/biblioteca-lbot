@@ -406,27 +406,31 @@ export async function convertCurrency(currency: "dolar" | "euro" | "real" | "ien
 }
 
 
-export async function cardsAgainstHumanity(){
+export async function funnyRandomPhrases(){
     try {
-        const URL_BASE = 'https://gist.githubusercontent.com/victorsouzaleal/bfbafb665a35436acc2310d51d754abb/raw/df5eee4e8abedbf1a18f031873d33f1e34ac338a/cartas.json'
-         
-        const {data : cards} = await axios.get(URL_BASE).catch(() => {
+        const URL_BASE = 'https://gist.githubusercontent.com/victorsouzaleal/bfbafb665a35436acc2310d51d754abb/raw/2be5f3b5333b2a9c97492888ed8e63b7c7675ae6/frases.json'
+        const IMAGE_URL = 'https://i.imgur.com/pRSN2ml.png'
+
+        let {data} = await axios.get(URL_BASE).catch(() => {
             throw new Error("Houve um erro ao obter a frase, tente novamente mais tarde.")
         })
 
-        let blackCardChosen = cards.cartas_pretas[Math.floor(Math.random() * cards.cartas_pretas.length)]
+        let responsePhrase = data.frases[Math.floor(Math.random() * data.frases.length)]
         let cont_params = 1
 
-        if(blackCardChosen.indexOf("{p3}") != -1) cont_params = 3
-        else if(blackCardChosen.indexOf("{p2}") != -1) cont_params = 2
+        if(responsePhrase.indexOf("{p3}") != -1) cont_params = 3
+        else if(responsePhrase.indexOf("{p2}") != -1) cont_params = 2
     
         for(let i = 1; i <= cont_params; i++){
-            let whiteCardChosen = cards.cartas_brancas[Math.floor(Math.random() * cards.cartas_brancas.length)]
-            blackCardChosen = blackCardChosen.replace(`{p${i}}`, `*${whiteCardChosen}*`)
-            cards.cartas_brancas.splice(cards.cartas_brancas.indexOf(whiteCardChosen, 1))
+            let complementChosen = data.complementos[Math.floor(Math.random() * data.complementos.length)]
+            responsePhrase = responsePhrase.replace(`{p${i}}`, `*${complementChosen}*`)
+            data.complementos.splice(data.complementos.indexOf(complementChosen, 1))
         }
 
-        return blackCardChosen as string
+        return {
+            image_url: IMAGE_URL,
+            text: responsePhrase as string
+        }
     } catch(err) {
         throw err
     }
@@ -470,14 +474,23 @@ export async function symbolsASCI(){
 
 export function truthMachine(){
     try {
-        const FILENAMES = ["conversapraboi.png", "estresse.png", "incerteza.png", "kao.png", "meengana.png", "mentiroso.png", "vaipra.png", "verdade.png"]
-        const calibrationImageBuffer = fs.readFileSync(path.join(mediaPath, 'calibrando.png'))
-        const filenameChosen = FILENAMES[Math.floor(Math.random() * FILENAMES.length)]
-        const resultImageBuffer = fs.readFileSync(path.join(mediaPath, filenameChosen))
+        const imageCalibration = 'https://i.imgur.com/kEWjkyP.png'
+        const imagesResult = [
+            'https://i.imgur.com/0N7hY1V.png',
+            'https://i.imgur.com/3JG8Cu2.png',
+            'https://i.imgur.com/44V8MHp.png',
+            'https://i.imgur.com/fky7kQl.png',
+            'https://i.imgur.com/M7gSj0p.png',
+            'https://i.imgur.com/2IhKZFI.png',
+            'https://i.imgur.com/mmX6cmR.png',
+            'https://i.imgur.com/hy9oYoX.png'
+        ]
+
+        const randomIndex = Math.floor(Math.random() * imagesResult.length)
 
         return {
-            calibration_image : calibrationImageBuffer,
-            result_image : resultImageBuffer
+            calibration_url : imageCalibration,
+            result_url : imagesResult[randomIndex]
         }
     } catch(err) {
         throw new Error("Houve um erro ao obter as imagens da máquina da verdade, tente novamente mais tarde.")
@@ -486,13 +499,13 @@ export function truthMachine(){
 
 export function flipCoin(){
     try {
-        const FILENAMES = ['cara.png', 'coroa.png']
-        const filenameChosen = FILENAMES[Math.floor(Math.random() * FILENAMES.length)]
-        const resultImageBuffer = fs.readFileSync(path.join(mediaPath, filenameChosen))
-
+        const coinSides = ['cara', 'coroa']
+        const chosenSide = coinSides[Math.floor(Math.random() * coinSides.length)]
+        const imageCoinUrl = chosenSide === 'cara' ? "https://i.imgur.com/E0jdBt1.png" : 'https://i.imgur.com/2uUDQab.png'
+    
         return {
-            result : filenameChosen.replace(".png", ''),
-            image : resultImageBuffer
+            chosen_side : chosenSide,
+            image_coin_url : imageCoinUrl
         }
     } catch(err) {
         throw new Error("Houve um erro ao obter as imagem do lado da moeda, tente novamente mais tarde.")
