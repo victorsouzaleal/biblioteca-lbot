@@ -174,6 +174,6 @@ export type StickerOptions = {
 
 export type AudioModificationType = "estourar" | "reverso" | "grave" | "agudo" | "x2" | "volume"
 
-export type FileExtensions = 'mp3' | 'mp4' | 'webp' | 'png' | 'jpg' | 'gif'
+export type FileExtensions = 'mp3' | 'mp4' | 'webp' | 'png' | 'jpg' | 'gif' | 'zip'
 
 export type StickerType = "resize"|"contain"|"circle"
