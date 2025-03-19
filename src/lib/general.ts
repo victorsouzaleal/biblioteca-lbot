@@ -1,5 +1,4 @@
 import axios from 'axios'
-import fs from 'fs-extra'
 import {prettyNum} from 'pretty-num'
 import translate from '@vitalets/google-translate-api'
 import google from '@victorsouzaleal/googlethis'
@@ -11,8 +10,6 @@ import {obterDadosBrasileiraoA, obterDadosBrasileiraoB, DadosBrasileirao} from '
 import {JSDOM} from 'jsdom'
 import UserAgent from 'user-agents'
 import { AnimeRelease, CurrencyConvert, MangaRelease, MusicLyrics, News, WebSearch, Wheather } from './interfaces.js'
-import path from 'node:path'
-const mediaPath = path.resolve(import.meta.dirname, '..', 'media')
 
 export async function simSimi(text: string){
     try {
@@ -161,7 +158,7 @@ export async function calcExpression(expr: string){
         calcResult = calcResult.split(" ")
         calcResult[0] = (calcResult[0].includes("e")) ? prettyNum(calcResult[0]) : calcResult[0]
         calcResult = calcResult.join(" ")
-
+        
         return calcResult as string
     } catch(err) {
         throw err
@@ -427,10 +424,12 @@ export async function funnyRandomPhrases(){
             data.complementos.splice(data.complementos.indexOf(complementChosen, 1))
         }
 
-        return {
+        const response = {
             image_url: IMAGE_URL,
             text: responsePhrase as string
         }
+
+        return response
     } catch(err) {
         throw err
     }
@@ -448,11 +447,13 @@ export async function infoDDD(ddd: string){
         const indexDDD = states.findIndex((state : { ddd: string }) => state.ddd.includes(ddd))
 
         if(indexDDD === -1) throw new Error("Este DDD não foi encontrado, certifique-se que ele é válido.")
-
-        return {
+        
+        const response = {
             state: states[indexDDD].nome,
             region: states[indexDDD].regiao
         }
+
+        return response
     } catch(err) {
         throw err
     }
@@ -487,11 +488,12 @@ export function truthMachine(){
         ]
 
         const randomIndex = Math.floor(Math.random() * imagesResult.length)
-
-        return {
+        const response = {
             calibration_url : imageCalibration,
             result_url : imagesResult[randomIndex]
         }
+
+        return response
     } catch(err) {
         throw new Error("Houve um erro ao obter as imagens da máquina da verdade, tente novamente mais tarde.")
     }
@@ -502,11 +504,12 @@ export function flipCoin(){
         const coinSides = ['cara', 'coroa']
         const chosenSide = coinSides[Math.floor(Math.random() * coinSides.length)]
         const imageCoinUrl = chosenSide === 'cara' ? "https://i.imgur.com/E0jdBt1.png" : 'https://i.imgur.com/2uUDQab.png'
-    
-        return {
+        const response = {
             chosen_side : chosenSide,
             image_coin_url : imageCoinUrl
         }
+        
+        return response
     } catch(err) {
         throw new Error("Houve um erro ao obter as imagem do lado da moeda, tente novamente mais tarde.")
     }

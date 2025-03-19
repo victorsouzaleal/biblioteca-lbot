@@ -10,7 +10,7 @@ export async function convertMp4ToMp3 (sourceType: 'buffer' | 'url',  video: Buf
 
         if(sourceType == 'buffer'){
             if(!Buffer.isBuffer(video)) throw new Error("O tipo selecionado da mídia foi Buffer mas a mídia não é um Buffer.")
-
+                
             fs.writeFileSync(inputVideoPath, video)
         } else if (sourceType == 'url'){
             if(typeof video != 'string') throw new Error("O tipo selecionado da mídia foi URL mas a mídia não é uma URL.")
@@ -53,11 +53,11 @@ export async function convertVideoToThumbnail(sourceType : "file"|"buffer"|"url"
 
         if(sourceType == "file"){
             if(typeof video !== 'string') throw new Error('O tipo de operação está definido como FILE mas a mídia enviada não é um caminho de arquivo válido.')
-
+        
             inputPath = video
         } else if(sourceType == "buffer"){
             if(!Buffer.isBuffer(video)) throw new Error('O tipo de operação está definido como BUFFER mas a mídia enviada não é um buffer válido.')
-
+            
             inputPath = getTempPath('mp4')
             fs.writeFileSync(inputPath, video)
         } else if(sourceType == "url"){
@@ -66,7 +66,7 @@ export async function convertVideoToThumbnail(sourceType : "file"|"buffer"|"url"
             const responseUrlBuffer = await axios.get(video,  { responseType: 'arraybuffer' }).catch(()=>{
                 throw new Error("Houve um erro ao fazer download da mídia para a thumbnail, tente novamente mais tarde.")
             })
-            
+
             const bufferUrl = Buffer.from(responseUrlBuffer.data, "utf-8")
             inputPath = getTempPath('mp4')
             fs.writeFileSync(inputPath, bufferUrl)
@@ -88,7 +88,7 @@ export async function convertVideoToThumbnail(sourceType : "file"|"buffer"|"url"
 
         const thumbBase64 : Base64URLString = fs.readFileSync(outputThumbnailPath).toString('base64')
         fs.unlinkSync(outputThumbnailPath)
-
+        
         return thumbBase64
     } catch(err){
         throw err

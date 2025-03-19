@@ -17,7 +17,7 @@ export async function textToVoice (lang: "pt" | 'en' | 'ja' | 'es' | 'it' | 'ru'
 
         await new Promise <void>((resolve) =>{
             tts(lang).save(audioPath, text, ()=> resolve())
-        }).catch(() =>{
+        }).catch(() => { 
             throw new Error("Houve um erro ao converter texto para voz, tente novamente mais tarde.")
         })
 
@@ -44,7 +44,7 @@ export async function audioTranscription (audioBuffer : Buffer, {deepgram_secret
         })
         
         if(error) throw new Error("Houve um erro ao obter a transcrição do áudio, use outro aúdio ou tente novamente mais tarde.")
-    
+
         return result.results.channels[0].alternatives[0].transcript
     } catch(err){
         throw err
@@ -96,7 +96,7 @@ export async function audioModified (audioBuffer: Buffer, type: AudioModificatio
         const bufferModifiedAudio = fs.readFileSync(outputAudioPath)
         fs.unlinkSync(inputAudioPath)
         fs.unlinkSync(outputAudioPath)
-
+        
         return bufferModifiedAudio
     } catch(err){
         throw err
@@ -107,11 +107,9 @@ export async function musicRecognition (mediaBuffer : Buffer, {acr_host , acr_ac
     try {
         const URL_BASE = 'https://identify-eu-west-1.acrcloud.com/v1/identify'
         const {mime} = await fileTypeFromBuffer(mediaBuffer) as FileTypeResult
-    
-        if(!mime.startsWith('video') && !mime.startsWith('audio')) throw new Error('Esse tipo de arquivo não é suportado.')
-    
         let audioBuffer : Buffer | undefined
-        
+
+        if(!mime.startsWith('video') && !mime.startsWith('audio')) throw new Error('Esse tipo de arquivo não é suportado.')
         if(mime.startsWith('video')) audioBuffer = await convertMp4ToMp3('buffer', mediaBuffer)
         else audioBuffer = mediaBuffer
 
@@ -148,7 +146,7 @@ export async function musicRecognition (mediaBuffer : Buffer, {acr_host , acr_ac
             title: recognitionResponse.metadata.music[0].title,
             artists: artists.toString()
         }
-
+        
         return musicRecognition
     } catch(err){
         throw err

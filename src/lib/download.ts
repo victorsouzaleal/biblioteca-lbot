@@ -1,4 +1,3 @@
-import fs from 'fs-extra'
 import {formatSeconds} from './util.js'
 import Youtube from 'youtube-sr'
 import ytdl from '@distube/ytdl-core'
@@ -116,7 +115,7 @@ export async function youtubeMedia (text : string){
             const {id : videoIdFound} = await Youtube.default.searchOne(text).catch(() => {
                 throw new Error('Houve um erro ao obter as informações do video, faça uma pesquisa diferente ou tente novamente mais tarde.')
             })
-    
+
             videoId = videoIdFound
         }
 
