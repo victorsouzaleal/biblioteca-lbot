@@ -9,6 +9,7 @@ import {fileTypeFromBuffer, FileTypeResult} from 'file-type'
 import axios, { AxiosRequestConfig } from 'axios'
 import FormData from 'form-data'
 import { AudioModificationType, MusicRecognition } from './interfaces.js'
+import crypto from 'node:crypto'
 
 
 export async function textToVoice (lang: "pt" | 'en' | 'ja' | 'es' | 'it' | 'ru' | 'ko' | 'sv', text: string){
@@ -105,7 +106,8 @@ export async function audioModified (audioBuffer: Buffer, type: AudioModificatio
 
 export async function musicRecognition (mediaBuffer : Buffer, {acr_host , acr_access_key, acr_access_secret}: {acr_host: string, acr_access_key: string, acr_access_secret: string}){
     try {
-        const URL_BASE = 'https://identify-eu-west-1.acrcloud.com/v1/identify'
+        const ENDPOINT = '/v1/identify'
+        const URL_BASE = 'http://'+ acr_host + ENDPOINT
         const {mime} = await fileTypeFromBuffer(mediaBuffer) as FileTypeResult
         let audioBuffer : Buffer | undefined
 
@@ -113,19 +115,25 @@ export async function musicRecognition (mediaBuffer : Buffer, {acr_host , acr_ac
         if(mime.startsWith('video')) audioBuffer = await convertMp4ToMp3('buffer', mediaBuffer)
         else audioBuffer = mediaBuffer
 
+        const timestamp = (new Date().getTime()/1000).toFixed(0).toString()
+        const signatureString = ['POST', ENDPOINT, acr_access_key, 'audio', 1, timestamp].join('\n')
+        const signature =  crypto.createHmac('sha1', acr_access_secret).update(Buffer.from(signatureString, 'utf-8')).digest().toString('base64');
         const formData = new FormData()
-        formData.append('host', acr_host?.trim())
-        formData.append('access_key', acr_access_key?.trim())
-        formData.append('access_secret', acr_access_secret?.trim())
-        formData.append('data_type', 'fingerprint')
-        formData.append('sample', audioBuffer, {filename: 'audio.mp3'})
+        formData.append('access_key', acr_access_key)
+        formData.append('data_type', 'audio')
+        formData.append('sample', audioBuffer)
+        formData.append('sample_bytes', audioBuffer.length)
+        formData.append('signature_version', 1)
+        formData.append('signature', signature)
+        formData.append('timestamp', timestamp)
+        
         const config : AxiosRequestConfig = {
             url: URL_BASE,
             method: 'POST',
             data: formData
         }
 
-        const { data : recognitionResponse} = await axios.request(config).catch(() => {
+        const { data : recognitionResponse} = await axios.request(config).catch((err) => {
             throw new Error('Houve um erro ao obter o reconhecimento de música, tente novamente mais tarde.')
         })
 
@@ -133,17 +141,17 @@ export async function musicRecognition (mediaBuffer : Buffer, {acr_host , acr_ac
         else if(recognitionResponse.status.code == 3003 || recognitionResponse.status.code == 3015) throw new Error("Você excedeu o limite do ACRCloud, crie uma nova chave no site")
         else if (recognitionResponse.status.code == 3000) throw new Error('Houve um erro no servidor do ACRCloud, tente novamente mais tarde')
 
-        let arrayReleaseDate = recognitionResponse.metadata.music[0].release_date.split("-")
+        let arrayReleaseDate = recognitionResponse.metadata.humming[0].release_date.split("-")
         let artists : string[] = []
 
-        for(let artist of recognitionResponse.metadata.music[0].artists) artists.push(artist.name)
-
+        for(let artist of recognitionResponse.metadata.humming[0].artists) artists.push(artist.name)
+        
         const musicRecognition : MusicRecognition = {
-            producer : recognitionResponse.metadata.music[0].label || "-----",
-            duration: duration.default(recognitionResponse.metadata.music[0].duration_ms).format("m:ss"),
+            producer : recognitionResponse.metadata.humming[0].label || "-----",
+            duration: duration.default(recognitionResponse.metadata.humming[0].duration_ms).format("m:ss"),
             release_date: `${arrayReleaseDate[2]}/${arrayReleaseDate[1]}/${arrayReleaseDate[0]}`,
-            album: recognitionResponse.metadata.music[0].album.name,
-            title: recognitionResponse.metadata.music[0].title,
+            album: recognitionResponse.metadata.humming[0].album.name,
+            title: recognitionResponse.metadata.humming[0].title,
             artists: artists.toString()
         }
         
