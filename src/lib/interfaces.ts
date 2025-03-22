@@ -1,5 +1,13 @@
 import ytdl from '@distube/ytdl-core'
 
+export interface SearchGame {
+    uploader: string
+    title: string
+    uploadDate: string,
+    fileSize: string,
+    uris: string[]
+}
+
 export interface MusicRecognition {
     producer : string,
     duration: string,

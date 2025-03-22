@@ -9,7 +9,7 @@ import { timestampToDate } from './util.js'
 import {obterDadosBrasileiraoA, obterDadosBrasileiraoB, DadosBrasileirao} from '@victorsouzaleal/brasileirao'
 import {JSDOM} from 'jsdom'
 import UserAgent from 'user-agents'
-import { AnimeRelease, CurrencyConvert, MangaRelease, MusicLyrics, News, WebSearch, Wheather } from './interfaces.js'
+import { AnimeRelease, CurrencyConvert, MangaRelease, MusicLyrics, News, SearchGame, WebSearch, Wheather } from './interfaces.js'
 
 export async function simSimi(text: string){
     try {
@@ -512,6 +512,39 @@ export function flipCoin(){
         return response
     } catch(err) {
         throw new Error("Houve um erro ao obter as imagem do lado da moeda, tente novamente mais tarde.")
+    }
+}
+
+export async function searchGame(gameTitle: string){
+    try{
+        const LIBRARIES = [
+            'https://hydralinks.cloud/sources/fitgirl.json',
+            'https://hydralinks.cloud/sources/dodi.json',
+            'https://hydralinks.cloud/sources/kaoskrew.json',
+            'https://hydralinks.cloud/sources/onlinefix.json',
+            'https://hydralinks.cloud/sources/steamrip.json',
+            'https://hydralinks.cloud/sources/atop-games.json'
+        ]
+        
+        let gamesList : SearchGame[] = []
+
+        for await (let library of LIBRARIES){
+            const libraryResponse = await axios.get(library, {responseType: 'json'})
+            
+            libraryResponse.data.downloads.forEach((game : any) =>{
+                gamesList.push({
+                    uploader: libraryResponse.data.name,
+                    ...game
+                })
+            })
+        }
+
+        const regex = new RegExp(gameTitle.split(" ").join("|"), 'i')
+        let resultList : SearchGame[] = gamesList.filter((game) => regex.test(game.title))
+
+        return resultList
+    } catch(err) {
+        throw err
     }
 }
 
