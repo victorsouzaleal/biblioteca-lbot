@@ -2,10 +2,10 @@ import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs-extra'
 import crypto from 'node:crypto'
 import webp from "node-webpmux"
-import {getTempPath} from './util.js'
+import {getTempPath} from '../util/util.js'
 import {fileTypeFromBuffer} from 'file-type'
 import jimp from 'jimp'
-import { StickerOptions, StickerType } from "./interfaces.js"
+import { StickerOptions, StickerType } from "../interfaces/interfaces.js"
 
 export async function createSticker(mediaBuffer : Buffer, {pack = 'LBOT', author = 'LBOT Stickers', fps = 9, type = 'resize'}: StickerOptions){
     try {

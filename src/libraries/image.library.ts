@@ -1,11 +1,11 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import {getRandomFilename} from './util.js'
+import {getRandomFilename} from '../util/util.js'
 import duration from 'format-duration-time'
 import google from '@victorsouzaleal/googlethis'
 import FormData from 'form-data'
 import getEmojiMixUrl, {checkSupported} from 'emoji-mixer'
 import {ImageUploadService} from 'node-upload-images'
-import { AnimeRecognition, ImageSearch } from './interfaces.js'
+import { AnimeRecognition, ImageSearch } from '../interfaces/interfaces.js'
 
 export async function uploadImage(imageBuffer : Buffer){
     try {

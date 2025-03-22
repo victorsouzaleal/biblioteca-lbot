@@ -3,7 +3,7 @@ import crypto from 'node:crypto'
 import {tmpdir} from 'node:os'
 import path  from "node:path"
 import fs from 'fs-extra'
-import { FileExtensions } from "./interfaces.js"
+import { FileExtensions } from "../interfaces/interfaces.js"
 
 export function timestampToDate(timestamp: number){
   return moment(timestamp).format('DD/MM HH:mm:ss')

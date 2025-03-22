@@ -1,14 +1,14 @@
 import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs-extra'
-import {getTempPath} from './util.js'
-import { convertMp4ToMp3 } from './convert.js'
+import {getTempPath} from '../util/util.js'
+import { convertMp4ToMp3 } from './convert.library.js'
 import duration from 'format-duration-time'
 import {createClient} from '@deepgram/sdk'
 import tts from 'node-gtts'
 import {fileTypeFromBuffer, FileTypeResult} from 'file-type'
 import axios, { AxiosRequestConfig } from 'axios'
 import FormData from 'form-data'
-import { AudioModificationType, MusicRecognition } from './interfaces.js'
+import { AudioModificationType, MusicRecognition } from '../interfaces/interfaces.js'
 import crypto from 'node:crypto'
 
 
